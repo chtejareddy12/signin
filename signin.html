@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign-In / Sign-Out Sheet</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .container {
+            margin-bottom: 20px;
+        }
+        .notification {
+            color: red;
+            font-weight: bold;
+        }
+        .clear-button, .copy-button {
+            margin: 10px 0;
+            padding: 5px 10px;
+            border: none;
+            background-color: #f44336;
+            color: white;
+            cursor: pointer;
+        }
+        .clear-button:hover, .copy-button:hover {
+            background-color: #d32f2f;
+        }
+        .form-group {
+            margin-bottom: 10px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            max-width: 200px;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+        .flex-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+        .flex-container > div {
+            flex: 1;
+            margin: 0 20px;
+        }
+        .calendar-container {
+            margin-bottom: 20px;
+        }
+        .date-controls {
+            display: flex;
+            align-items: center;
+        }
+        .date-controls button {
+            background-color: #f44336;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+        .date-controls button:hover {
+            background-color: #d32f2f;
+        }
+        #calendar {
+            width: 100px;
+            text-align: center;
+            margin: 0 10px;
+        }
+        .date-list {
+            margin-bottom: 20px;
+            list-style: none;
+            padding: 0;
+        }
+        .date-list li {
+            display: inline-block;
+            margin: 5px;
+        }
+        .date-list button {
+            border: none;
+            background-color: #2196F3;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .date-list button:hover {
+            background-color: #1976D2;
+        }
+    </style>
+</head>
+<body>
+    <h1>Sign-In / Sign-Out Sheet</h1>
+
+    <!-- Display available dates -->
+    <ul id="dateList" class="date-list">
+        <!-- Dates will be inserted here dynamically -->
+    </ul>
+
+    <div class="calendar-container">
+        <label for="calendar">Select Date:</label>
+        <div class="date-controls">
+            <button id="prevDate" onclick="changeDate(-1)">&#9664;</button> <!-- Left Arrow -->
+            <input type="text" id="calendar" onchange="updateDateFromInput()" placeholder="mm/dd/yy">
+            <button id="nextDate" onclick="changeDate(1)">&#9654;</button> <!-- Right Arrow -->
+        </div>
+    </div>
+
+    <div class="flex-container">
+        <!-- Sign-In Section -->
+        <div class="container">
+            <h2>Sign-In</h2>
+            <div class="form-group">
+                <label for="signInFirstName">First Name:</label>
+                <input type="text" id="signInFirstName" placeholder="Enter your first name">
+            </div>
+            <div class="form-group">
+                <label for="signInLastName">Last Name:</label>
+                <input type="text" id="signInLastName" placeholder="Enter your last name">
+            </div>
+            <div class="form-group">
+                <label for="groupSelect">Group:</label>
+                <select id="groupSelect">
+                    <option value="" selected disabled>Select a group</option>
+                    <option value="Raul">Raul</option>
+                    <option value="Tatiyana">Tatiyana</option>
+                    <option value="Snd">Snd</option>
+                    <option value="Esther">Esther</option>
+                    <option value="Regulars">Regulars</option>
+                </select>
+            </div>
+            <button onclick="signIn()">Sign In</button>
+            <button onclick="deleteEntry()">Delete Entry</button>
+            <div id="signInNotification" class="notification"></div>
+        </div>
+
+        <!-- Sign-Out Section -->
+        <div class="container">
+            <h2>Sign-Out</h2>
+            <div class="form-group">
+                <label for="signOutFirstName">First Name:</label>
+                <input type="text" id="signOutFirstName" placeholder="Enter your first name">
+            </div>
+            <div class="form-group">
+                <label for="signOutLastName">Last Name:</label>
+                <input type="text" id="signOutLastName" placeholder="Enter your last name">
+            </div>
+            <div class="form-group">
+                <label for="standNumber">Stand Number:</label>
+                <input type="text" id="standNumber" placeholder="Enter stand number">
+            </div>
+            <button onclick="signOut()">Sign Out</button>
+            <div id="signOutNotification" class="notification"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>Records</h2>
+        <div class="form-group">
+            <label for="search">Search:</label>
+            <input type="text" id="search" placeholder="Search for records..." oninput="filterTable('recordsTable', 'search')">
+        </div>
+        <table id="recordsTable">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Group</th>
+                    <th>Stand Number</th>
+                    <th>Sign-In Time</th>
+                    <th>Sign-Out Time</th>
+                    <th>Total Hours</th> <!-- New column for Total Hours -->
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Records will be inserted here -->
+            </tbody>
+        </table>
+        <button class="clear-button" onclick="clearRecords()">Clear Records</button>
+        <button class="copy-button" onclick="copyFilteredTableData('recordsTable', 'search')">Copy Records</button>
+    </div>
+
+    <script>
+        const defaultDate = new Date().toISOString().split('T')[0];
+        let selectedDate = localStorage.getItem('selectedDate') || defaultDate;
+
+        document.addEventListener("DOMContentLoaded", () => {
+            document.getElementById('calendar').value = formatDate(selectedDate);
+            loadTable();
+            updateDateList();
+        });
+
+        function formatDate(date) {
+            const d = new Date(date);
+            const month = ('0' + (d.getMonth() + 1)).slice(-2);
+            const day = ('0' + d.getDate()).slice(-2);
+            const year = d.getFullYear().toString().slice(-2);
+            return `${month}/${day}/${year}`;
+        }
+
+        function parseDate(dateStr) {
+            const [month, day, year] = dateStr.split('/');
+            const fullYear = parseInt(year, 10) + 2000; // Adjust year format (assuming 20xx)
+            return new Date(fullYear, month - 1, day);
+        }
+
+        function changeDate(offset) {
+            const date = new Date(selectedDate);
+            date.setDate(date.getDate() + offset);
+            selectedDate = date.toISOString().split('T')[0];
+            document.getElementById('calendar').value = formatDate(selectedDate);
+            localStorage.setItem('selectedDate', selectedDate);
+            clearTable();
+            loadTable();
+        }
+
+        function updateDateFromInput() {
+            const input = document.getElementById('calendar').value;
+            const newDate = parseDate(input);
+            if (newDate.toString() !== 'Invalid Date') {
+                selectedDate = newDate.toISOString().split('T')[0];
+                document.getElementById('calendar').value = formatDate(selectedDate);
+                localStorage.setItem('selectedDate', selectedDate);
+                clearTable();
+                loadTable();
+            } else {
+                alert('Invalid date format. Please use mm/dd/yy.');
+            }
+        }
+
+        function capitalizeName(name) {
+            if (!name) return "";
+            return name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
+        }
+
+        function signIn() {
+            const firstName = capitalizeName(document.getElementById("signInFirstName").value.trim());
+            const lastName = capitalizeName(document.getElementById("signInLastName").value.trim());
+            const group = document.getElementById("groupSelect").value;
+
+            const notification = document.getElementById("signInNotification");
+            notification.textContent = ""; // Clear previous notification
+
+            if (!firstName || !lastName || !group) {
+                notification.textContent = "Please enter all required fields.";
+                displayNotification(notification);
+                clearFormFields(); // Reset all fields
+                return;
+            }
+
+            const records = JSON.parse(localStorage.getItem('allRecordsData')) || [];
+            const exists = records.some(record =>
+                record.firstName === firstName &&
+                record.lastName === lastName &&
+                record.date === selectedDate
+            );
+
+            if (exists) {
+                notification.textContent = "This entry already exists for the selected date.";
+                displayNotification(notification);
+                clearFormFields(); // Reset all fields
+                return;
+            }
+
+            records.push({
+                date: selectedDate,
+                firstName: firstName,
+                lastName: lastName,
+                group: group,
+                standNumber: "",
+                signInTime: new Date().toLocaleTimeString(),
+                signOutTime: ""
+            });
+
+            localStorage.setItem('allRecordsData', JSON.stringify(records));
+            notification.textContent = "Sign-in recorded successfully.";
+            displayNotification(notification);
+            clearFormFields(); // Reset all fields
+            clearTable();
+            loadTable();
+            updateDateList(); // Update the date list after sign-in
+        }
+
+        function signOut() {
+            const firstName = capitalizeName(document.getElementById("signOutFirstName").value.trim());
+            const lastName = capitalizeName(document.getElementById("signOutLastName").value.trim());
+            const standNumber = document.getElementById("standNumber").value.trim();
+
+            const notification = document.getElementById("signOutNotification");
+            notification.textContent = ""; // Clear previous notification
+
+            if (!firstName || !lastName || !standNumber) {
+                notification.textContent = "Please enter all required fields.";
+                displayNotification(notification);
+                clearFormFields(); // Reset all fields
+                return;
+            }
+
+            const records = JSON.parse(localStorage.getItem('allRecordsData')) || [];
+            const index = records.findIndex(record =>
+                record.firstName === firstName &&
+                record.lastName === lastName &&
+                record.signOutTime === "" &&
+                record.date === selectedDate
+            );
+
+            if (index === -1) {
+                notification.textContent = "No sign-in record found for this person.";
+                displayNotification(notification);
+                clearFormFields(); // Reset all fields
+                return;
+            }
+
+            records[index].standNumber = standNumber;
+            records[index].signOutTime = new Date().toLocaleTimeString();
+
+            localStorage.setItem('allRecordsData', JSON.stringify(records));
+            notification.textContent = "Sign-out recorded successfully.";
+            displayNotification(notification);
+            clearFormFields(); // Reset all fields
+            clearTable();
+            loadTable();
+        }
+
+        function clearFormFields() {
+            // Reset all input fields and selects
+            const fields = [
+                "signInFirstName", "signInLastName", "groupSelect",
+                "signOutFirstName", "signOutLastName", "standNumber"
+            ];
+            fields.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    if (element.tagName === 'SELECT') {
+                        element.selectedIndex = 0; // Reset select element
+                    } else {
+                        element.value = ""; // Clear text fields
+                    }
+                }
+            });
+        }
+
+        function displayNotification(notification) {
+            setTimeout(() => {
+                notification.textContent = "";
+            }, 2000);
+        }
+
+        function clearRecords() {
+            const confirmation = confirm("Are you sure you want to clear all records for this date?");
+            if (confirmation) {
+                let records = JSON.parse(localStorage.getItem('allRecordsData')) || [];
+                records = records.filter(record => record.date !== selectedDate);
+                localStorage.setItem('allRecordsData', JSON.stringify(records));
+                clearTable();
+                loadTable();
+                updateDateList(); // Update the date list after clearing records
+            }
+        }
+
+        function filterTable(tableId, inputId) {
+            const input = document.getElementById(inputId);
+            const filter = input.value.toLowerCase();
+            const table = document.getElementById(tableId);
+            const rows = table.getElementsByTagName('tr');
+
+            for (let i = 1; i < rows.length; i++) {
+                const cells = rows[i].getElementsByTagName('td');
+                let found = false;
+                for (let j = 0; j < cells.length; j++) {
+                    if (cells[j].innerText.toLowerCase().includes(filter)) {
+                        found = true;
+                        break;
+                    }
+                }
+                rows[i].style.display = found ? '' : 'none';
+            }
+        }
+
+        function loadTable() {
+            const records = JSON.parse(localStorage.getItem('allRecordsData')) || [];
+            const tableBody = document.querySelector('#recordsTable tbody');
+            tableBody.innerHTML = "";
+
+            records
+                .filter(record => record.date === selectedDate)
+                .forEach(record => {
+                    const signInTime = parseTime(record.signInTime);
+                    const signOutTime = parseTime(record.signOutTime);
+
+                    // Calculate total hours
+                    const totalHours = (signOutTime - signInTime) / (1000 * 60 * 60); // Convert from milliseconds to hours
+
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${record.date}</td>
+                        <td>${record.firstName}</td>
+                        <td>${record.lastName}</td>
+                        <td>${record.group}</td>
+                        <td>${record.standNumber}</td>
+                        <td>${record.signInTime}</td>
+                        <td>${record.signOutTime}</td>
+                        <td>${isNaN(totalHours) ? 'N/A' : totalHours.toFixed(2)}</td> <!-- Display Total Hours -->
+                    `;
+                    tableBody.appendChild(row);
+                });
+        }
+
+        function parseTime(timeStr) {
+            const [hours, minutes] = timeStr.split(':').map(Number);
+            const now = new Date();
+            now.setHours(hours, minutes, 0, 0);
+            return now;
+        }
+
+        function clearTable() {
+            document.querySelector('#recordsTable tbody').innerHTML = "";
+        }
+
+        function copyFilteredTableData(tableId, inputId) {
+            const table = document.getElementById(tableId);
+            const input = document.getElementById(inputId);
+            const filter = input.value.toLowerCase();
+            let data = "";
+
+            for (let i = 1; i < table.rows.length; i++) {
+                const cells = table.rows[i].cells;
+                let rowData = "";
+                let rowIncluded = false;
+
+                for (let j = 0; j < cells.length; j++) {
+                    if (cells[j].innerText.toLowerCase().includes(filter)) {
+                        rowIncluded = true;
+                    }
+                    rowData += cells[j].innerText + "\t";
+                }
+
+                if (rowIncluded) {
+                    data += rowData.trim() + "\n";
+                }
+            }
+
+            if (data) {
+                navigator.clipboard.writeText(data).then(() => {
+                    alert("Filtered data copied to clipboard.");
+                }).catch(err => {
+                    alert("Failed to copy data: " + err);
+                });
+            } else {
+                alert("No data found to copy.");
+            }
+        }
+
+        function updateDateList() {
+            const records = JSON.parse(localStorage.getItem('allRecordsData')) || [];
+            const dateList = document.getElementById('dateList');
+            const dates = [...new Set(records.map(record => record.date))];
+
+            dateList.innerHTML = ""; // Clear previous list
+
+            dates.forEach(date => {
+                const button = document.createElement('button');
+                button.textContent = formatDate(date);
+                button.onclick = () => {
+                    selectedDate = date;
+                    document.getElementById('calendar').value = formatDate(selectedDate);
+                    localStorage.setItem('selectedDate', selectedDate);
+                    clearTable();
+                    loadTable();
+                };
+                const listItem = document.createElement('li');
+                listItem.appendChild(button);
+                dateList.appendChild(listItem);
+            });
+        }
+    </script>
+</body>
+</html>
